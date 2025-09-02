@@ -12,7 +12,7 @@ export default function SyncControls() {
     try {
       let res;
       if (direction === "toSQL") {
-        res = await axios.get("/api/sync/check-google");
+        res = await axios.post("/api/sync/sheets-to-sql");
       } else if (direction === "toGoogle") {
         res = await axios.post("/api/sync/to-sheet");
       } else if (direction === "clearSheet") {
