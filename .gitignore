@@ -1,6 +1,8 @@
 .env
 node_modules/
 credentials.json
+service-account.json
+*.swp
 .env
 node_modules/
 credentials.json
