@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const API = "http://localhost:5001/api/songs";
-const DOWNLOADS_API = "http://localhost:5001/api/downloads";
 
 export const getSongs = () => axios.get(API);
 
@@ -23,10 +22,10 @@ export const deleteSong = (songId: number) =>
   axios.delete(`${API}/${songId}`);
 
 export const queueSong = (songId: number) =>
-  axios.post(`${DOWNLOADS_API}/queue/${songId}`);
-
-export const queueMissingSongs = () =>
-  axios.post(`${DOWNLOADS_API}/queue-missing`);
+  axios.post(
+    `${API}/queue/${songId}`);
 
 export const getDownloadStats = () =>
-  axios.get(`${DOWNLOADS_API}/stats`);
+  axios.get(
+    "http://localhost:5001/api/downloads/stats"
+  );

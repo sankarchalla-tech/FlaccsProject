@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSongs, deleteSong, queueSong, queueMissingSongs } from "../services/songService";
+import { getSongs, deleteSong, queueSong } from "../services/songService";
 import EditSongModal from "./EditSongModal";
 
 export default function SongTable() {
@@ -9,7 +9,6 @@ export default function SongTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedSong, setSelectedSong] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
-  const [queuingAll, setQueuingAll] = useState(false);
 
   const PAGE_SIZE = 50;
 
@@ -65,25 +64,6 @@ export default function SongTable() {
     }
   };
 
-  const handleQueueAllMissing = async () => {
-    const confirmed = window.confirm(
-      "Queue all missing songs for download?"
-    );
-    if (!confirmed) return;
-
-    setQueuingAll(true);
-    try {
-      const res = await queueMissingSongs();
-      alert(`${res.data.queued} missing songs added to queue`);
-      loadSongs();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to queue missing songs");
-    } finally {
-      setQueuingAll(false);
-    }
-  };
-
   const totalPages = Math.ceil(filteredSongs.length / PAGE_SIZE);
 
   const paginatedSongs = filteredSongs.slice(
@@ -121,14 +101,6 @@ export default function SongTable() {
         <label htmlFor="missingOnly" className="text-sm font-medium">
           Show Missing Songs Only
         </label>
-
-        <button
-          onClick={handleQueueAllMissing}
-          disabled={queuingAll}
-          className="ml-auto bg-purple-600 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
-        >
-          {queuingAll ? "Queuing..." : "Queue All Missing"}
-        </button>
       </div>
 
       <div className="mb-3 text-sm text-gray-600">
