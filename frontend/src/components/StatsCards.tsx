@@ -40,7 +40,7 @@ export default function StatsCards() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-6">
       <div className="bg-white shadow rounded-xl p-6">
         <h3 className="text-gray-500 text-sm">Total Songs</h3>
         <p className="text-3xl font-bold">{stats.total_songs}</p>
