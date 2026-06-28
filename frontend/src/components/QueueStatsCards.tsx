@@ -9,9 +9,13 @@ export default function QueueStatsCards() {
     failed: 0,
   });
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+useEffect(() => {
+  loadStats();
+
+  const timer = setInterval(loadStats, 5000);
+
+  return () => clearInterval(timer);
+}, []);
 
   async function loadStats() {
     try {

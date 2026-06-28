@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
-import { getSongs, deleteSong, queueSong } from "../services/songService";
+import {
+  getSongs,
+  getNotDownloadedSongs,
+  getMissingFiles,
+  deleteSong,
+  queueSong,
+  queueMissingSongs,
+} from "../services/songService";
 import EditSongModal from "./EditSongModal";
 
 export default function SongTable() {
   const [songs, setSongs] = useState([]);
   const [search, setSearch] = useState("");
-  const [showMissingOnly, setShowMissingOnly] = useState(false);
+  const [filter, setFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedSong, setSelectedSong] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -13,27 +20,46 @@ export default function SongTable() {
   const PAGE_SIZE = 50;
 
   useEffect(() => {
-    loadSongs();
-  }, []);
+    loadSongs(filter);
 
-  async function loadSongs() {
-    try {
-      const res = await getSongs();
-      setSongs(res.data);
-    } catch (err) {
-      console.error(err);
+    const timer = setInterval(() => loadSongs(filter), 5000);
+
+    return () => clearInterval(timer);
+  }, [filter]);
+
+  async function loadSongs(selectedFilter = filter) {
+  try {
+    let res;
+
+    switch (selectedFilter) {
+      case "notDownloaded":
+        res = await getNotDownloadedSongs();
+        break;
+
+      case "missingFiles":
+        res = await getMissingFiles();
+        break;
+
+      default:
+        res = await getSongs();
     }
+
+    console.log("Filter:", selectedFilter);
+    console.log("API returned:", res.data);
+
+    setSongs(res.data);
+  } catch (err) {
+    console.error(err);
   }
+}
 
   const filteredSongs = songs.filter((song: any) => {
     const matchesSearch =
       song.Title?.toLowerCase().includes(search.toLowerCase()) ||
       song.Artist?.toLowerCase().includes(search.toLowerCase());
 
-    const matchesMissing =
-      !showMissingOnly || song.IsDownloaded?.toLowerCase() !== "yes";
+    return matchesSearch ;
 
-    return matchesSearch && matchesMissing;
   });
 
   const handleDelete = async (songId: number, title: string) => {
@@ -86,21 +112,28 @@ export default function SongTable() {
         />
       </div>
 
-      <div className="flex items-center gap-2 mb-4">
-        <input
-          type="checkbox"
-          id="missingOnly"
-          checked={showMissingOnly}
+      <div className="flex items-between gap-2 mb-4">
+        <select
+          value={filter}
           onChange={(e) => {
-            setShowMissingOnly(e.target.checked);
-            setCurrentPage(1); // Reset to first page on filter change
+            setFilter(e.target.value);
           }}
-          className="h-4 w-4"
-        />
+        >
+          <option value="all">All Songs</option>
+          <option value="notDownloaded">Not Downloaded</option>
+          <option value="missingFiles">Missing Files</option>
+        </select>
 
-        <label htmlFor="missingOnly" className="text-sm font-medium">
-          Show Missing Songs Only
-        </label>
+        <button
+          onClick={async () => {
+            const res = await queueMissingSongs();
+
+            alert(`${res.data.queued} songs queued successfully`);
+          }}
+          className="bg-purple-600 text-white px-4 py-2 rounded"
+        >
+          Queue All Missing Songs
+        </button>
       </div>
 
       <div className="mb-3 text-sm text-gray-600">

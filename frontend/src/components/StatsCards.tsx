@@ -27,8 +27,12 @@ export default function StatsCards() {
         setLoading(false);
       }
     }
-
     fetchStats();
+      const timer = setInterval(fetchStats, 5000);
+
+      return () => clearInterval(timer);
+
+
   }, []);
 
   if (loading) {

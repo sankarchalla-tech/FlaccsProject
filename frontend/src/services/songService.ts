@@ -29,3 +29,14 @@ export const getDownloadStats = () =>
   axios.get(
     "http://localhost:5001/api/downloads/stats"
   );
+
+  export const queueMissingSongs = () =>
+  axios.post(
+    "http://localhost:5001/api/songs/queue/missing"
+  );
+
+  export const getNotDownloadedSongs = () =>
+  axios.get(`${API}/not-downloaded`);
+
+export const getMissingFiles = () =>
+  axios.get(`${API}/missing-files`);
