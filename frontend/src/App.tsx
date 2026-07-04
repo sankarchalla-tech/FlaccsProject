@@ -1,22 +1,25 @@
-import SyncHistory from './components/Sync History';
-import SyncControls from './components/SyncControls';
-import StatsCards from './components/StatsCards';
-import SongTable from "./components/SongTable";
-import QueueStatsCards from './components/QueueStatsCards';
-import LibraryHealthCard from './components/LibraryHealthCard';
+import AppLayout from "./components/layout/AppLayout";
+import AppRoutes from "./routes/AppRoutes";
+import ToastProvider from "./providers/ToastProvider";
+import { useLoading } from "./components/context/LoadingContext";
+import  LoadingOverlay  from "./components/ui/LoadingOverlay";
 
-const App = () => {
+export default function App() {
+  const { loading, title, message } = useLoading();
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-700 p-4">
-      <h1 className="text-white text-4xl font-bold mb-6">🎵 FLACC Music Sync Manager</h1>
-      <SyncControls />
-      <SyncHistory />
-      <StatsCards />
-      <QueueStatsCards />
-      <LibraryHealthCard />
-      <SongTable />
-    </div>
-  )
-}
+    <>
+      <AppLayout>
+        <AppRoutes />
+        <ToastProvider />
+      </AppLayout>
 
-export default App
+      <ToastProvider />
+
+      <LoadingOverlay
+        open={loading}
+        title={title}
+        message={message}
+      />
+    </>
+  );
+}

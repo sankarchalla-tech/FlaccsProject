@@ -83,21 +83,37 @@ export async function updateSong(songId, song) {
   return result.rows[0];
 }
 
+export async function withTransaction(callback) {
+  const client = await postgres.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await callback(client);
+
+    await client.query("COMMIT");
+
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function deleteSong(songId) {
-  await postgres.query(
-    `
-    BEGIN;
+  return postgres.transaction(async (client) => {
+    await client.query(
+      "DELETE FROM download_queue WHERE song_id = $1",
+      [songId]
+    );
 
-    DELETE FROM download_queue
-    WHERE song_id = $1;
-
-    DELETE FROM songs
-    WHERE song_id = $1;
-
-    COMMIT;
-    `,
-    [songId],
-  );
+    await client.query(
+      "DELETE FROM songs WHERE song_id = $1",
+      [songId]
+    );
+  });
 }
 
 export async function searchSongs(query) {

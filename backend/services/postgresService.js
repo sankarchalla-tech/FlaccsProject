@@ -1,15 +1,29 @@
 import pool from "../db/pool.js";
 
 export async function query(sql, params = []) {
+  return pool.query(sql, params);
+}
+
+export async function transaction(callback) {
+  const client = await pool.connect();
+
   try {
-    const result = await pool.query(sql, params);
+    await client.query("BEGIN");
+
+    const result = await callback(client);
+
+    await client.query("COMMIT");
+
     return result;
   } catch (err) {
-    console.error("Database Error:", err.message);
+    await client.query("ROLLBACK");
     throw err;
+  } finally {
+    client.release();
   }
 }
 
 export default {
-  query
+  query,
+  transaction,
 };

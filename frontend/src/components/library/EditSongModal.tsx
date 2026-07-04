@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { updateSong } from "../services/songService";
+import { updateSong } from "../../services/songService";
+import { useToast } from "../../hooks/useToast";
 
 interface Props {
   song: any;
@@ -21,6 +22,7 @@ export default function EditSongModal({
   }, [song]);
 
   if (!isOpen || !song) return null;
+  const toast = useToast();
 
   const handleSave = async () => {
     try {
@@ -29,7 +31,7 @@ export default function EditSongModal({
       onClose();
     } catch (err) {
       console.error("Update failed:", err);
-      alert("Failed to update song");
+      toast.error("Failed to update song");
     }
   };
 
